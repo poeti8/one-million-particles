@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>1,000,000 Particles</title>
+  </head>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { position: relative; font-family: 'Times New Roman', Times, serif; width: 100vw; height: 100vh; margin: 0; padding: 0; background-color: #021119; color: #d7d7d7; overflow: hidden; }
+    canvas { width: 100%; height: 100%; }
+    .guide { position: absolute; bottom: 10%; left: 0; display: flex; width: 100%; flex-direction: column; justify-content: center; align-items: center; font-size: 14px; z-index: 1; }
+    .title { position: absolute; width: 100%; top: 5%; left: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 10px; }
+    .title p { margin: 0; opacity: 0.5; }
+    .source { margin-top: 16px; font-size: 12px; letter-spacing: 0.03em; }
+    .source * { margin: 0 6px 0; }
+    .source, .source a { display: flex; align-items: center; }
+    .source a { opacity: 0.6; color: #d7d7d7; border-bottom: 1px dotted #d7d7d7; text-decoration: none; }
+    .source a:hover { opacity: 1; }
+    .dot { opacity: 0.6; }
+    .mouse { display: flex; }
+    .gestures { display: none; }
+    .mouse, .gestures { align-items: center; }
+    .mouse div, .gestures div { display: flex; margin: 0 10px; align-items: center; }
+    .mouse span, .gestures span { margin-left: 8px; opacity: 0.4; }
+    .mouse svg, .gestures svg { opacity: 0.3; width: 20px; height: auto; }
+    .gestures svg { opacity: 0.4; margin-bottom: 4px; }
+    @media only screen and (hover: none) {
+      .guide { bottom: 15% }
+      .mouse { display: none; }
+      .gestures { display: flex; }
+    }
+  </style>
+  
+  <body>
+    <canvas></canvas>
+    <div class="title">
+      <p>
+        one million particles rendered with the GPGPU technique using WebGL.
+      </p>
+      <div class="source">
+        <a href="https://github.com/poeti8/one-million-particles" target="_blank">↗︎ SOURCE CODE</a>
+        <span class="dot">·</span>
+        <a href="https://www.youtube.com/watch?v=7aynyPX80BQ" target="_blank">↗︎ VIDEO EXPLAINATION</a>
+      </div>
+    </div>
+    <div class="guide">
+      <div class="mouse">
+        <div>
+          <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.5027 9.96958C20.7073 10.4588 20.6154 12.1941 19.3658 12.5533L13.0605 14.3658L10.1807 20.2606C9.60996 21.4288 7.88499 21.218 7.6124 19.9468L4.67677 6.25646C4.44638 5.18204 5.5121 4.2878 6.53019 4.70126L19.5027 9.96958Z" stroke="#d7d7d7" stroke-width="1.5"></path></svg>
+          <span>PLAY</span>
+        </div>
+        <div>
+          <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M20 10V14C20 18.4183 16.4183 22 12 22C7.58172 22 4 18.4183 4 14V9C4 5.13401 7.13401 2 11 2H12C16.4183 2 20 5.58172 20 10Z" stroke="#d7d7d7" stroke-width="1.5" stroke-linecap="round"></path><path d="M12 2V8.4C12 8.73137 11.7314 9 11.4 9H4" stroke="#d7d7d7" stroke-width="1.5" stroke-linecap="round"></path></svg>
+          <span>ROTATE</span>
+        </div>
+        <div>
+          <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M12 5L12.5303 4.46967C12.2374 4.17678 11.7626 4.17678 11.4697 4.46967L12 5ZM12 13L11.4697 13.5303C11.7626 13.8232 12.2374 13.8232 12.5303 13.5303L12 13ZM9.46967 6.46967C9.17678 6.76256 9.17678 7.23744 9.46967 7.53033C9.76256 7.82322 10.2374 7.82322 10.5303 7.53033L9.46967 6.46967ZM13.4697 7.53033C13.7626 7.82322 14.2374 7.82322 14.5303 7.53033C14.8232 7.23744 14.8232 6.76256 14.5303 6.46967L13.4697 7.53033ZM10.5303 10.4697C10.2374 10.1768 9.76256 10.1768 9.46967 10.4697C9.17678 10.7626 9.17678 11.2374 9.46967 11.5303L10.5303 10.4697ZM14.5303 11.5303C14.8232 11.2374 14.8232 10.7626 14.5303 10.4697C14.2374 10.1768 13.7626 10.1768 13.4697 10.4697L14.5303 11.5303ZM3.25 10V14H4.75V10H3.25ZM20.75 14V10H19.25V14H20.75ZM11.25 5V13H12.75V5H11.25ZM11.4697 4.46967L9.46967 6.46967L10.5303 7.53033L12.5303 5.53033L11.4697 4.46967ZM11.4697 5.53033L13.4697 7.53033L14.5303 6.46967L12.5303 4.46967L11.4697 5.53033ZM12.5303 12.4697L10.5303 10.4697L9.46967 11.5303L11.4697 13.5303L12.5303 12.4697ZM12.5303 13.5303L14.5303 11.5303L13.4697 10.4697L11.4697 12.4697L12.5303 13.5303ZM20.75 10C20.75 5.16751 16.8325 1.25 12 1.25V2.75C16.0041 2.75 19.25 5.99594 19.25 10H20.75ZM12 22.75C16.8325 22.75 20.75 18.8325 20.75 14H19.25C19.25 18.0041 16.0041 21.25 12 21.25V22.75ZM3.25 14C3.25 18.8325 7.16751 22.75 12 22.75V21.25C7.99594 21.25 4.75 18.0041 4.75 14H3.25ZM4.75 10C4.75 5.99594 7.99594 2.75 12 2.75V1.25C7.16751 1.25 3.25 5.16751 3.25 10H4.75Z" fill="#d7d7d7"></path></svg>
+          <span>ZOOM</span>
+        </div>
+        <div>
+          <?xml version="1.0" encoding="UTF-8"?><svg width="24px" height="24px" stroke-width="1.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" color="#000000"><path d="M4 10V14C4 18.4183 7.58172 22 12 22C16.4183 22 20 18.4183 20 14V9C20 5.13401 16.866 2 13 2H12C7.58172 2 4 5.58172 4 10Z" stroke="#d7d7d7" stroke-width="1.5" stroke-linecap="round"></path><path d="M12 2V8.4C12 8.73137 12.2686 9 12.6 9H20" stroke="#d7d7d7" stroke-width="1.5" stroke-linecap="round"></path></svg>
+          <span>PAN</span>
+        </div>
+      </div>
+      <div class="gestures">
+        <div>
+          <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="#d7d7d7"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-hand-click"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5" /><path d="M11 11.5v-2a1.5 1.5 0 0 1 3 0v2.5" /><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5" /><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7l-.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" /><path d="M5 3l-1 -1" /><path d="M4 7h-1" /><path d="M14 3l1 -1" /><path d="M15 6h1" /></svg>
+          <span>PLAY</span>
+        </div>
+        <div>
+          <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="#d7d7d7"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-hand-two-fingers"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M8 13v-8.5a1.5 1.5 0 0 1 3 0v7.5" /><path d="M17 11.5a1.5 1.5 0 0 1 3 0v4.5a6 6 0 0 1 -6 6h-2h.208a6 6 0 0 1 -5.012 -2.7a69.74 69.74 0 0 1 -.196 -.3c-.312 -.479 -1.407 -2.388 -3.286 -5.728a1.5 1.5 0 0 1 .536 -2.022a1.867 1.867 0 0 1 2.28 .28l1.47 1.47" /><path d="M14 10.5a1.5 1.5 0 0 1 3 0v1.5" /><path d="M11 5.5v-2a1.5 1.5 0 1 1 3 0v8.5" /></svg>
+          <span>ZOOM & PAN</span>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "./libs/noise": "./libs/noise.js",
+        "three": "./libs/three.module.min.js",
+        "three/addons/": "./libs/"
+      }
+    }
+  </script>
+
+  <script id="fboPositionVertexShader" type="x-shader/x-vertex">
+    void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    }
+  </script>
+
+  <script id="fboPositionFragmentShader" type="x-shader/x-fragment">
+    uniform sampler2D uOriginalPositionsTexture;
+    uniform sampler2D uPositionsTexture;
+    uniform sampler2D uVelocitiesTexture;
+    uniform vec2 uTextureResolution;
+    uniform vec3 uPointer;
+    uniform vec3 uPointerStart;
+    uniform float uNoiseFrequency;
+    uniform float uNoiseAmplitude;
+    uniform float uTime;
+    uniform float uDeltaTime;
+
+    ${noise}
+    
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uTextureResolution;
+      vec3 originalPosition = texture2D(uOriginalPositionsTexture, uv).rgb;
+      vec3 position = texture2D(uPositionsTexture, uv).rgb;
+      vec4 velocity = texture2D(uVelocitiesTexture, uv).rgba;
+      vec3 diffPosition = originalPosition - position;
+      float diffPositionLength = clamp(length(diffPosition), 0.0, 1.0);
+
+      position += curlNoise(originalPosition + uTime * uNoiseFrequency) * uNoiseAmplitude;
+      position += velocity.xyz * uDeltaTime;
+
+      gl_FragColor = vec4(position, length(diffPosition));
+    }
+  </script>
+
+  <script id="fboVelocityVertexShader" type="x-shader/x-vertex">
+    void main() {
+      gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    }
+  </script>
+
+  <script id="fboVelocityFragmentShader" type="x-shader/x-fragment">
+    uniform sampler2D uOriginalPositionsTexture;
+    uniform sampler2D uPositionsTexture;
+    uniform sampler2D uVelocitiesTexture;
+    uniform vec2 uTextureResolution;
+    uniform vec3 uPointer;
+    uniform vec3 uPointerStart;
+    
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uTextureResolution;
+      vec3 originalPosition = texture2D(uOriginalPositionsTexture, uv).rgb;
+      vec3 position = texture2D(uPositionsTexture, uv).rgb;
+      vec4 velocity = texture2D(uVelocitiesTexture, uv).rgba;
+  
+      // if pointer hits a particle
+      vec3 diffToPointer = position - uPointer;    
+      float pointerDiffLength = distance(uPointer, uPointerStart);
+      float distanceToPointer = length(position.xy - uPointer.xy);
+      float isHit = 1.0 - smoothstep(0.0, 1.0, distanceToPointer);
+      
+      // find target position
+      vec3 target = originalPosition + normalize(diffToPointer) * clamp(pow(2.5, pointerDiffLength * 4.0), 1.0, 100.0) * isHit;
+      
+      // move that position
+      velocity.xyz = target - position; 
+
+      gl_FragColor = vec4(velocity.xyz, 1.0);
+    }
+  </script>
+
+
+  <script type="module">
+    import * as  THREE from "three";
+    import { TextGeometry } from "three/addons/TextGeometry.js";
+    import { FontLoader } from "three/addons/FontLoader.js";
+    import * as BufferGeometryUtils from "three/addons/BufferGeometryUtils.js";
+    import { OrbitControls } from "three/addons/OrbitControls.js";
+    import { MeshSurfaceSampler } from "three/addons/MeshSurfaceSampler.js";
+    import noise from "./libs/noise";
+
+    // text scene
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, window.innerWidth < 500 ? 76 : window.innerWidth < 980 ? 46 : 26);
+
+    // fbo scene
+    const fboScene = new THREE.Scene();
+    const fboCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1 / Math.pow(2, 53), 1);
+    
+    // fbo config
+    const fboWidth = 1000;
+    const fboHeight = 1000;
+    const COUNT = fboWidth * fboHeight;
+    
+    // uniforms
+    const textUniforms = {
+      uWatermarbleTexture: { value: null },
+      uPositionsTexture: { value: null },
+      uVelocitiesTexture: { value: null },
+    };
+    const fboUniforms = {
+      uOriginalPositionsTexture: { value: null },
+      uPositionsTexture: { value: null },
+      uVelocitiesTexture: { value: null },
+      uTextureResolution: { value: new THREE.Vector2(fboWidth, fboHeight) },
+      uPointer: { value: new THREE.Vector3() },
+      uPointerStart: { value: new THREE.Vector3() },
+      uNoiseFrequency: { value: 0.15 },
+      uNoiseAmplitude: { value: 0.002 },
+      uTime: { value: 0 },
+      uDeltaTime: { value: 0 },
+      uComeBack: { value: 0 },
+    };
+
+    // fbo shaders
+    // text shaders are written in literal string further down below
+    const fboPositionVertexShader = document.getElementById("fboPositionVertexShader").textContent;
+    const fboPositionFragmentShader = document.getElementById("fboPositionFragmentShader").textContent.replace("${noise}", noise);
+    const fboVelocityVertexShader = document.getElementById("fboVelocityVertexShader").textContent;
+    const fboVelocityFragmentShader = document.getElementById("fboVelocityFragmentShader").textContent;
+
+    // water marble texture
+    new THREE.TextureLoader().load("./assets/watermarble.jpg", function (watermarbleTexture) {
+      watermarbleTexture.wrapS = THREE.RepeatWrapping;
+      watermarbleTexture.wrapT = THREE.RepeatWrapping;
+      textUniforms.uWatermarbleTexture.value = watermarbleTexture;
+    });
+
+    // lights
+    const directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
+    directionalLight.position.set(-1, 2, 3);
+    const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1);
+    scene.add(directionalLight);
+    scene.add(ambientLight);
+
+    // text
+    const textGeometry = new THREE.BufferGeometry();
+    const textMaterial = new THREE.PointsMaterial({ size: 0.04, opacity: 0.6, transparent: true });
+    const text = new THREE.Points(textGeometry, textMaterial);
+    text.position.set(0, 0.5, 0);
+    text.material.onBeforeCompile = function (shader) {
+      shader.uniforms = {
+        ...shader.uniforms,
+        ...textUniforms,
+      }
+      shader.vertexShader = `
+        uniform sampler2D uPositionsTexture;
+        varying vec2 vUv;
+        varying float vTemperature;
+        ${shader.vertexShader}
+      `.replace(
+        "#include <begin_vertex>",
+        `
+          #include <begin_vertex>
+          transformed = texture2D(uPositionsTexture, position.xy).rgb;
+          vTemperature = texture2D(uPositionsTexture, position.xy).a;
+          vUv = uv;
+        `
+      );
+      shader.fragmentShader = `
+        uniform sampler2D uWatermarbleTexture;
+        varying float vTemperature;
+        varying vec2 vUv;
+        ${shader.fragmentShader}    
+      `.replace(
+        "vec4 diffuseColor = vec4( diffuse, opacity );",
+        `
+          vec3 watermarbleTexture = texture2D(uWatermarbleTexture, vUv).xyz;
+          vec3 highlightColor = vec3(0.3, 0.6, 1.0);
+          vec3 fincalColor = mix(watermarbleTexture, highlightColor, (vTemperature / 1.5));
+          vec4 diffuseColor = vec4( fincalColor, opacity );
+        `
+      )
+    }
+
+    // fbo mesh
+    const fboMeshGeometry = new THREE.BufferGeometry();
+    const fboPlaneGeometryPositions = new Float32Array([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0]);
+    fboMeshGeometry.setAttribute("position", new THREE.BufferAttribute(fboPlaneGeometryPositions, 3));
+    const fboMeshMaterial = new THREE.ShaderMaterial({ uniforms: fboUniforms });
+    const fboMesh = new THREE.Mesh(fboMeshGeometry, fboMeshMaterial);
+    fboScene.add(fboMesh);
+
+    // fbo render targets
+    let fboPositionRenderTarget1 = new THREE.RenderTarget(fboWidth, fboHeight, {
+      minFilter: THREE.NearestFilter,
+      magFilter: THREE.NearestFilter,
+      format: THREE.RGBAFormat,
+      type: THREE.FloatType,
+    });
+    let fboPositionRenderTarget2 = fboPositionRenderTarget1.clone();
+    let fboVelocityRenderTarget1 = fboPositionRenderTarget1.clone();
+    let fboVelocityRenderTarget2 = fboPositionRenderTarget1.clone();
+
+    const fontConfig = {
+      font: null,
+      size: 3,
+      depth: 1,
+      bevelThickness: 0,
+      bevelSize: 0.01,
+      bevelEnabled: true,
+    }
+    
+    function setTextGeometry() {
+      const text1Geometry = new TextGeometry("1,000,000", fontConfig);
+      const text2Geometry = new TextGeometry("PARTICLES", fontConfig);
+      const text2Offset = new THREE.Vector3(-2, -4.5, 0);
+      for (let i = 0; i < text2Geometry.attributes.position.count; i++) {
+        const i3 = i * 3;
+        text2Geometry.attributes.position.array[i3 + 0] += text2Offset.x;
+        text2Geometry.attributes.position.array[i3 + 1] += text2Offset.y;
+      }
+      text2Geometry.attributes.position.needsUpdate = true;
+      text.geometry = BufferGeometryUtils.mergeGeometries([text1Geometry, text2Geometry]);
+      text.geometry.computeBoundingBox();
+      const textWidth = text.geometry.boundingBox.max.x - text.geometry.boundingBox.min.x;
+      const textHeight = text.geometry.boundingBox.max.y - text.geometry.boundingBox.min.y;
+      text.position.x -= textWidth / 2 + text2Offset.x; 
+      text.position.y -= textHeight / 2 + text2Offset.y; 
+
+      const surfaceSampler = new MeshSurfaceSampler(text).build();
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(COUNT * 3);
+      const uvs = new Float32Array(COUNT * 2);
+      const fboPositionData = new Float32Array(COUNT * 4);
+      const fboVelocityData = new Float32Array(COUNT * 4);
+
+      const tempPosition = new THREE.Vector3();
+      for (let i = 0; i < COUNT; i++) {
+        const i2 = i * 2;
+        const i3 = i * 3;
+        const i4 = i * 4;
+        
+        // sample a postion from the surface of the text
+        surfaceSampler.sample(tempPosition);
+        const [x, y, z] = tempPosition;
+
+        // intialize the position and velocity for fbo
+        fboPositionData[i4 + 0] = x;
+        fboPositionData[i4 + 1] = y;
+        fboPositionData[i4 + 2] = z;
+
+        // set particles position on the texture
+        positions[i3 + 0] = (i % fboWidth) / fboWidth;
+        positions[i3 + 1] = ~~(i / fboWidth) / fboHeight;
+        positions[i3 + 2] = 0;
+        
+        // calculate uv based on text's width and height
+        const xlength = x - text.geometry.boundingBox.min.x;
+        const ylength = x - text.geometry.boundingBox.min.y;
+        uvs[i2 + 0] = xlength / textWidth;
+        uvs[i2 + 1] = ylength / textHeight;
+      }
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+
+      fboMesh.material.uniforms.uOriginalPositionsTexture.value = new THREE.DataTexture(
+          new Float32Array(fboPositionData), // wrap it in Float32Array again to make a copy
+          fboWidth, fboHeight, THREE.RGBAFormat, THREE.FloatType
+        );
+      fboMesh.material.uniforms.uOriginalPositionsTexture.value.needsUpdate = true;
+      
+      fboMesh.material.uniforms.uPositionsTexture.value = new THREE.DataTexture(
+          new Float32Array(fboPositionData), // wrap it in Float32Array again to make a copy
+          fboWidth, fboHeight, THREE.RGBAFormat, THREE.FloatType
+        );
+      fboMesh.material.uniforms.uPositionsTexture.value.needsUpdate = true;
+
+      fboMesh.material.uniforms.uVelocitiesTexture.value = new THREE.DataTexture(
+        fboVelocityData,
+        fboWidth, fboHeight, THREE.RGBAFormat, THREE.FloatType
+      );
+      fboMesh.material.uniforms.uVelocitiesTexture.value.needsUpdate = true;
+
+      textUniforms.uPositionsTexture.value = fboMesh.material.uniforms.uPositionsTexture.value;
+      text.geometry = geometry;
+      text.geometry.computeBoundingSphere();
+      text.geometry.boundingSphere.radius = 1000;
+    }
+    
+    const fontLoader = new FontLoader();
+    fontLoader.load("./assets/font.json", function (font) {
+      fontConfig.font = font;
+      setTextGeometry();
+    });
+        
+    scene.add(text);
+
+    const canvas = document.querySelector("canvas");
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPerformance: "high-performance",
+      canvas,
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x021119);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    const orbitControls = new OrbitControls(camera, renderer.domElement);
+    orbitControls.enableDamping = true;
+    orbitControls.touches = {
+      TWO: THREE.TOUCH.DOLLY_ROTATE
+    };
+    orbitControls.update();
+
+    // plane to capture mouse position
+    const raycasterPlaneGeometry = new THREE.PlaneGeometry(100, 100);
+    const raycasterPlaneMaterial = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, depthTest: false, depthWrite: false });
+    const raycasterPlane = new THREE.Mesh(raycasterPlaneGeometry, raycasterPlaneMaterial);
+    raycasterPlane.position.set(0, 0, 0.5);
+    raycasterPlane.visible = false;
+    scene.add(raycasterPlane);
+
+    // raycaster
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    function onPointerMove(event) {
+      pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+	    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+    let pointerStartCountdown = 0;
+    
+    // clock
+    const clock = new THREE.Clock();
+    
+    function render() {
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+      
+      // fbo
+      if (!fboMesh.material.uniforms.uPositionsTexture.value) return requestAnimationFrame(render);
+      if (!fboMesh.material.uniforms.uVelocitiesTexture.value) return requestAnimationFrame(render);
+      const temp = fboVelocityRenderTarget1;
+      fboVelocityRenderTarget1 = fboVelocityRenderTarget2;
+      fboVelocityRenderTarget2 = temp;
+      fboMesh.material.vertexShader = fboVelocityVertexShader;
+      fboMesh.material.fragmentShader = fboVelocityFragmentShader;
+      fboMesh.material.needsUpdate = true;
+      renderer.setRenderTarget(fboVelocityRenderTarget1);
+      renderer.clear();
+      renderer.render(fboScene, fboCamera);
+      fboMesh.material.uniforms.uVelocitiesTexture.value = fboVelocityRenderTarget1.texture;
+      const temp2 = fboPositionRenderTarget1;
+      fboPositionRenderTarget1 = fboPositionRenderTarget2;
+      fboPositionRenderTarget2 = temp2;
+      fboMesh.material.vertexShader = fboPositionVertexShader;
+      fboMesh.material.fragmentShader = fboPositionFragmentShader;
+      fboMesh.material.needsUpdate = true;
+      renderer.setRenderTarget(fboPositionRenderTarget1);
+      renderer.clear();
+      renderer.render(fboScene, fboCamera);
+      fboMesh.material.uniforms.uPositionsTexture.value = fboPositionRenderTarget1.texture;
+      renderer.setRenderTarget(null);
+      textUniforms.uPositionsTexture.value = fboMesh.material.uniforms.uPositionsTexture.value;
+
+      fboMesh.material.uniforms.uTime.value = time;
+      fboMesh.material.uniforms.uDeltaTime.value = delta;
+      
+      // raycaster
+      raycaster.setFromCamera(pointer, camera);
+      const intersects = raycaster.intersectObjects([raycasterPlane]);
+      if (intersects[0]) {
+        fboMesh.material.uniforms.uPointer.value = intersects[0].point.clone().sub(text.position);
+      }
+      if (pointerStartCountdown <= 0) {
+        fboMesh.material.uniforms.uPointerStart.value = fboMesh.material.uniforms.uPointer.value;
+        pointerStartCountdown = 10;
+      } else {
+        pointerStartCountdown -= 1;
+      }
+      
+      renderer.render(scene, camera);
+      orbitControls.update();
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("resize", onWindowResize);
+
+    function onWindowResize(){
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        camera.position.z = window.innerWidth < 500 ? 76 : window.innerWidth < 980 ? 46 : 26;
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+  </script>
+</html>
